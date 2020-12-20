@@ -279,6 +279,12 @@ namespace EWorldType
 	};
 }
 
+enum class EDuplicateForPie
+{
+	SDO_No_DuplicateForPie = 0x0,
+	SDO_DuplicateForPie = 0x1
+};
+
 enum class EObjectFlags
 {
 	RF_Public = 0x1,
