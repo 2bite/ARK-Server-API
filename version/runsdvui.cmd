@@ -1,0 +1,2 @@
+cd /d "C:\Users\sysadm\source\repos\_git_public\ARK-Server-API\version" &msbuild "version.vcxproj" /t:sdvViewer /p:configuration="Ark" /p:platform="x64" /p:SolutionDir="C:\Users\sysadm\source\repos\_git_public\ARK-Server-API" 
+exit %errorlevel% 
