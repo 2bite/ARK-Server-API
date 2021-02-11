@@ -361,7 +361,8 @@ struct AShooterGameSession : AGameSession
 	void InitOptions(FString* Options) { NativeCall<void, FString*>(this, "AShooterGameSession.InitOptions", Options); }
 	void RegisterServer() { NativeCall<void>(this, "AShooterGameSession.RegisterServer"); }
 	void UpdatePublishedSession() { NativeCall<void>(this, "AShooterGameSession.UpdatePublishedSession"); }
-	FString* ApproveLogin(FString* result, FString* Options, FString* authToken) { return NativeCall<FString*, FString*, FString*, FString*>(this, "AShooterGameSession.ApproveLogin", result, Options, authToken); }
+	//FString *__fastcall AShooterGameSession::ApproveLogin(AShooterGameSession *this, FString *result, const FString *Options, const FString *authToken, UNetConnection *Connection)
+	FString* ApproveLogin(FString* result, FString* Options, FString* authToken, UNetConnection* Connection) { return NativeCall<FString*, FString*, FString*, FString*, UNetConnection*>(this, "AShooterGameSession.ApproveLogin", result, Options, authToken, Connection); }
 	void OnCheckAuthTokenComplete(bool bWasSuccessful, FUniqueNetId* UserId) { NativeCall<void, bool, FUniqueNetId*>(this, "AShooterGameSession.OnCheckAuthTokenComplete", bWasSuccessful, UserId); }
 	void OnNumConnectedPlayersChanged(int NewPlayersCount) { NativeCall<void, int>(this, "AShooterGameSession.OnNumConnectedPlayersChanged", NewPlayersCount); }
 	void Tick(float __formal) { NativeCall<void, float>(this, "AShooterGameSession.Tick", __formal); }
