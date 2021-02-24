@@ -70,12 +70,10 @@ namespace ArkApi
 
 	void Hook_UWorld_Tick(DWORD64 world, DWORD64 tick_type, float delta_seconds)
 	{
-		auto* command = dynamic_cast<Commands*>(API::game_api->GetCommands().get());
-		if (command != nullptr && typeid(*command) == typeid(Commands))
-		{
+		if (auto* command = dynamic_cast<Commands*>(API::game_api->GetCommands().get())) {
 			command->CheckOnTickCallbacks(delta_seconds);
 		}
-
+		
 		UWorld_Tick_original(world, tick_type, delta_seconds);
 	}
 
