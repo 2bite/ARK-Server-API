@@ -73,7 +73,7 @@ namespace ArkApi
 		if (auto* command = dynamic_cast<Commands*>(API::game_api->GetCommands().get())) {
 			command->CheckOnTickCallbacks(delta_seconds);
 		}
-		
+
 		UWorld_Tick_original(world, tick_type, delta_seconds);
 	}
 
@@ -92,8 +92,7 @@ namespace ArkApi
 		const long double now_time = ArkApi::GetApiUtils().GetWorld()->TimeSecondsField();
 
 		const auto spam_check = now_time - last_chat_time < 1.0;
-		if (last_chat_time > 0 && spam_check)
-		{
+		if (last_chat_time > 0 && spam_check)		{
 			return;
 		}
 
@@ -105,8 +104,7 @@ namespace ArkApi
 		const auto prevent_default = dynamic_cast<ArkApi::Commands&>(*API::game_api->GetCommands()).
 			CheckOnChatMessageCallbacks(player_controller, message, mode, spam_check, command_executed);
 
-		if (command_executed || prevent_default)
-		{
+		if (command_executed || prevent_default)		{
 			return;
 		}
 
@@ -125,8 +123,7 @@ namespace ArkApi
 	void Hook_RCONClientConnection_ProcessRCONPacket(RCONClientConnection* _this, RCONPacket* packet,
 		UWorld* in_world)
 	{
-		if (_this->IsAuthenticatedField())
-		{
+		if (_this->IsAuthenticatedField())		{
 			dynamic_cast<Commands&>(*API::game_api->GetCommands()).CheckRconCommands(_this, packet, in_world);
 		}
 
@@ -135,9 +132,7 @@ namespace ArkApi
 
 	void Hook_AGameState_DefaultTimer(AGameState* _this)
 	{
-		Commands* command = dynamic_cast<Commands*>(API::game_api->GetCommands().get());
-		if (command)
-		{
+		if (auto* command = dynamic_cast<Commands*>(API::game_api->GetCommands().get())) {
 			command->CheckOnTimerCallbacks();
 		}
 
