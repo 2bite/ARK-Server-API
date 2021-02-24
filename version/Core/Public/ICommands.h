@@ -21,15 +21,15 @@ namespace ArkApi
 		 * \param callback Callback function
 		 */
 		virtual void AddChatCommand(const FString& command,
-		                            const std::function<void(AShooterPlayerController*, FString*, EChatSendMode::Type)>&
-		                            callback) = 0;
+			const std::function<void(AShooterPlayerController*, FString*, EChatSendMode::Type)>&
+			callback) = 0;
 		/**
 		* \brief Adds a console command
 		* \param command Command name
 		* \param callback Callback function
 		*/
 		virtual void AddConsoleCommand(const FString& command,
-		                               const std::function<void(APlayerController*, FString*, bool)>& callback) = 0;
+			const std::function<void(APlayerController*, FString*, bool)>& callback) = 0;
 
 		/**
 		* \brief Adds a rcon command
@@ -37,8 +37,8 @@ namespace ArkApi
 		* \param callback Callback function
 		*/
 		virtual void AddRconCommand(const FString& command,
-		                            const std::function<void(RCONClientConnection*, RCONPacket*, UWorld*)>& callback) =
-		0;
+			const std::function<void(RCONClientConnection*, RCONPacket*, UWorld*)>& callback) =
+			0;
 
 		/**
 		 * \brief Added function will be called every frame
@@ -60,8 +60,8 @@ namespace ArkApi
 		* \param callback Callback function
 		*/
 		virtual void AddOnChatMessageCallback(const FString& id,
-		                                      const std::function<bool(AShooterPlayerController*, FString*,
-		                                                               EChatSendMode::Type, bool, bool)>& callback) = 0;
+			const std::function<bool(AShooterPlayerController*, FString*,
+				EChatSendMode::Type, bool, bool)>& callback) = 0;
 
 		/**
 		 * \brief Removes a chat command
@@ -104,6 +104,17 @@ namespace ArkApi
 		* \return true if success, false otherwise
 		*/
 		virtual bool RemoveOnChatMessageCallback(const FString& id) = 0;
+
+		
+		virtual bool CheckChatCommands(AShooterPlayerController* shooter_player_controller, FString* message,
+			EChatSendMode::Type mode) = 0;
+		virtual bool CheckConsoleCommands(APlayerController* a_player_controller, FString* cmd, bool write_to_log) = 0;
+		virtual bool CheckRconCommands(RCONClientConnection* rcon_client_connection, RCONPacket* rcon_packet,
+			UWorld* u_world) = 0;
+		virtual void CheckOnTickCallbacks(float delta_seconds) = 0;
+		virtual void CheckOnTimerCallbacks() = 0;
+		virtual bool CheckOnChatMessageCallbacks(AShooterPlayerController* player_controller, FString* message,
+			EChatSendMode::Type mode, bool spam_check, bool command_executed) = 0;
 	};
 
 	ARK_API ICommands& APIENTRY GetCommands();

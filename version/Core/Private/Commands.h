@@ -42,16 +42,16 @@ namespace ArkApi
 		bool RemoveOnTickCallback(const FString& id) override;
 		bool RemoveOnTimerCallback(const FString& id) override;
 		bool RemoveOnChatMessageCallback(const FString& id) override;
-
+		
 		bool CheckChatCommands(AShooterPlayerController* shooter_player_controller, FString* message,
-		                       EChatSendMode::Type mode);
-		bool CheckConsoleCommands(APlayerController* a_player_controller, FString* cmd, bool write_to_log);
+		                       EChatSendMode::Type mode) override;
+		bool CheckConsoleCommands(APlayerController* a_player_controller, FString* cmd, bool write_to_log) override;
 		bool CheckRconCommands(RCONClientConnection* rcon_client_connection, RCONPacket* rcon_packet,
-		                       UWorld* u_world);
-		void CheckOnTickCallbacks(float delta_seconds);
-		void CheckOnTimerCallbacks();
+		                       UWorld* u_world) override;
+		void CheckOnTickCallbacks(float delta_seconds) override;
+		void CheckOnTimerCallbacks() override;
 		bool CheckOnChatMessageCallbacks(AShooterPlayerController* player_controller, FString* message,
-		                                 EChatSendMode::Type mode, bool spam_check, bool command_executed);
+		                                 EChatSendMode::Type mode, bool spam_check, bool command_executed) override;
 
 	private:
 		template <typename T>
