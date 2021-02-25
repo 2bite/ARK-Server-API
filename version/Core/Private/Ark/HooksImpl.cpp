@@ -13,7 +13,7 @@ namespace ArkApi
 	// Hooks declaration
 	DECLARE_HOOK(UEngine_Init, void, DWORD64, DWORD64);
 	DECLARE_HOOK(UWorld_InitWorld, void, UWorld*, DWORD64);
-	DECLARE_HOOK(UWorld_Tick, void, DWORD64, ELevelTick, float);
+	DECLARE_HOOK(UWorld_Tick, void, UWorld*, ELevelTick, float);
 	DECLARE_HOOK(AShooterGameMode_InitGame, void, AShooterGameMode*, FString*, FString*, FString*);
 	DECLARE_HOOK(AShooterPlayerController_ServerSendChatMessage_Impl, void, AShooterPlayerController*, FString*,
 	EChatSendMode::Type);
@@ -47,9 +47,9 @@ namespace ArkApi
 
 	// Hooks
 
-	void Hook_UEngine_Init(DWORD64 _this, DWORD64 InEngineLoop)
+	void Hook_UEngine_Init(DWORD64 engine, DWORD64 in_engine_loop)
 	{
-		UEngine_Init_original(_this, InEngineLoop);
+		UEngine_Init_original(engine, in_engine_loop);
 
 		Log::GetLog()->info("UGameEngine::Init was called");
 		Log::GetLog()->info("Loading plugins..\n");
@@ -59,33 +59,21 @@ namespace ArkApi
 		dynamic_cast<API::IBaseApi&>(*API::game_api).RegisterCommands();
 	}
 
-	void Hook_UWorld_InitWorld(UWorld* world, DWORD64 ivs)
+	void Hook_UWorld_InitWorld(UWorld* world, DWORD64 initialization_values)
 	{
 		Log::GetLog()->info("UWorld::InitWorld was called");
 
 		dynamic_cast<ApiUtils&>(*API::game_api->GetApiUtils()).SetWorld(world);
 
-		UWorld_InitWorld_original(world, ivs);
+		UWorld_InitWorld_original(world, initialization_values);
 	}
 
-	void Hook_UWorld_Tick(DWORD64 world, ELevelTick tick_type, float delta_seconds)
-	{
-
-		if (tick_type == ELevelTick::LEVELTICK_All && delta_seconds > 0) {
-			if (auto* command = dynamic_cast<Commands*>(API::game_api->GetCommands().get())) {
-				command->CheckOnTickCallbacks(delta_seconds);
-			}
-		}
-
-		UWorld_Tick_original(world, tick_type, delta_seconds);
-	}
-
-	void Hook_AShooterGameMode_InitGame(AShooterGameMode* a_shooter_game_mode, FString* map_name, FString* options,
+	void Hook_AShooterGameMode_InitGame(AShooterGameMode* shooter_game_mode, FString* map_name, FString* options,
 		FString* error_message)
 	{
-		dynamic_cast<ApiUtils&>(*API::game_api->GetApiUtils()).SetShooterGameMode(a_shooter_game_mode);
+		dynamic_cast<ApiUtils&>(*API::game_api->GetApiUtils()).SetShooterGameMode(shooter_game_mode);
 
-		AShooterGameMode_InitGame_original(a_shooter_game_mode, map_name, options, error_message);
+		AShooterGameMode_InitGame_original(shooter_game_mode, map_name, options, error_message);
 	}
 
 	void Hook_AShooterPlayerController_ServerSendChatMessage_Impl(
@@ -114,37 +102,51 @@ namespace ArkApi
 		AShooterPlayerController_ServerSendChatMessage_Impl_original(player_controller, message, mode);
 	}
 
-	FString* Hook_APlayerController_ConsoleCommand(APlayerController* a_player_controller, FString* result,
+	FString* Hook_APlayerController_ConsoleCommand(APlayerController* player_controller, FString* result,
 		FString* cmd, bool write_to_log)
 	{
 		dynamic_cast<Commands&>(*API::game_api->GetCommands()).CheckConsoleCommands(
-			a_player_controller, cmd, write_to_log);
+			player_controller, cmd, write_to_log);
 
-		return APlayerController_ConsoleCommand_original(a_player_controller, result, cmd, write_to_log);
+		return APlayerController_ConsoleCommand_original(player_controller, result, cmd, write_to_log);
 	}
 
-	void Hook_RCONClientConnection_ProcessRCONPacket(RCONClientConnection* _this, RCONPacket* packet,
+	void Hook_RCONClientConnection_ProcessRCONPacket(RCONClientConnection* connection, RCONPacket* packet,
 		UWorld* in_world)
 	{
-		if (_this->IsAuthenticatedField()) {
-			dynamic_cast<Commands&>(*API::game_api->GetCommands()).CheckRconCommands(_this, packet, in_world);
+		if (connection->IsAuthenticatedField()) {
+			dynamic_cast<Commands&>(*API::game_api->GetCommands()).CheckRconCommands(connection, packet, in_world);
 		}
 
-		RCONClientConnection_ProcessRCONPacket_original(_this, packet, in_world);
+		RCONClientConnection_ProcessRCONPacket_original(connection, packet, in_world);
 	}
 
-	void Hook_AGameState_DefaultTimer(AGameState* _this)
+
+	void Hook_UWorld_Tick(UWorld* world, ELevelTick tick_type, float delta_seconds)
 	{
-		if (auto* command = dynamic_cast<Commands*>(API::game_api->GetCommands().get())) {
-			command->CheckOnTimerCallbacks();
+		if (world && tick_type == ELevelTick::LEVELTICK_All && delta_seconds > 0) {
+			if (auto* command = dynamic_cast<Commands*>(API::game_api->GetCommands().get())) {
+				command->CheckOnTickCallbacks(delta_seconds);
+			}
 		}
 
-		AGameState_DefaultTimer_original(_this);
+		UWorld_Tick_original(world, tick_type, delta_seconds);
+	}
+	
+	void Hook_AGameState_DefaultTimer(AGameState* game_state)
+	{
+		if (game_state)		{
+			if (auto* command = dynamic_cast<Commands*>(API::game_api->GetCommands().get())) {
+				command->CheckOnTimerCallbacks();
+			}
+		}
+	
+		AGameState_DefaultTimer_original(game_state);
 	}
 
-	void Hook_AShooterGameMode_BeginPlay(AShooterGameMode* _AShooterGameMode)
+	void Hook_AShooterGameMode_BeginPlay(AShooterGameMode* shooter_game_mode)
 	{
-		AShooterGameMode_BeginPlay_original(_AShooterGameMode);
+		AShooterGameMode_BeginPlay_original(shooter_game_mode);
 
 		dynamic_cast<ApiUtils&>(*API::game_api->GetApiUtils()).SetStatus(ServerStatus::Ready);
 	}
