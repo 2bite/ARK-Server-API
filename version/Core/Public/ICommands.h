@@ -104,43 +104,6 @@ namespace ArkApi
 		* \return true if success, false otherwise
 		*/
 		virtual bool RemoveOnChatMessageCallback(const FString& id) = 0;
-
-		/**
-		* \brief Check if the chat message is a command
-		* \return true if success, false otherwise
-		*/
-		virtual bool CheckChatCommands(AShooterPlayerController* shooter_player_controller, FString* message,
-			EChatSendMode::Type mode) = 0;
-
-		/**
-		* \brief Check if the console message is a command
-		* \return true if success, false otherwise
-		*/
-		virtual bool CheckConsoleCommands(APlayerController* a_player_controller, FString* cmd, bool write_to_log) = 0;
-
-
-		/**
-		* \brief Check if the RCON message is a command
-		* \return true if success, false otherwise
-		*/
-		virtual bool CheckRconCommands(RCONClientConnection* rcon_client_connection, RCONPacket* rcon_packet,
-			UWorld* u_world) = 0;
-
-		/**
-		* \brief Check the functions that will be called every frame
-		*/
-		virtual void CheckOnTickCallbacks(float delta_seconds) = 0;
-
-		/**
-		* \brief Check the functions that will be called by the timer
-		*/
-		virtual void CheckOnTimerCallbacks() = 0;
-
-		/**
-		* \brief Check the functions that will be called when there is a new message in the chat
-		*/
-		virtual bool CheckOnChatMessageCallbacks(AShooterPlayerController* player_controller, FString* message,
-			EChatSendMode::Type mode, bool spam_check, bool command_executed) = 0;
 	};
 
 	ARK_API ICommands& APIENTRY GetCommands();

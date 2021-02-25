@@ -13,7 +13,7 @@ namespace ArkApi
 	// Hooks declaration
 	DECLARE_HOOK(UEngine_Init, void, DWORD64, DWORD64);
 	DECLARE_HOOK(UWorld_InitWorld, void, UWorld*, DWORD64);
-	DECLARE_HOOK(UWorld_Tick, void, DWORD64, DWORD64, float);
+	DECLARE_HOOK(UWorld_Tick, void, DWORD64, ELevelTick::Type, float);
 	DECLARE_HOOK(AShooterGameMode_InitGame, void, AShooterGameMode*, FString*, FString*, FString*);
 	DECLARE_HOOK(AShooterPlayerController_ServerSendChatMessage_Impl, void, AShooterPlayerController*, FString*,
 	EChatSendMode::Type);
@@ -68,8 +68,9 @@ namespace ArkApi
 		UWorld_InitWorld_original(world, ivs);
 	}
 
-	void Hook_UWorld_Tick(DWORD64 world, DWORD64 tick_type, float delta_seconds)
+	void Hook_UWorld_Tick(DWORD64 world, ELevelTick::Type tick_type, float delta_seconds)
 	{
+		Log::GetLog()->info("UWorld::Tick called world:{} tick_type:{} delta_seconds:{}", world, tick_type, delta_seconds);
 		if (auto* command = dynamic_cast<Commands*>(API::game_api->GetCommands().get())) {
 			command->CheckOnTickCallbacks(delta_seconds);
 		}
@@ -92,7 +93,7 @@ namespace ArkApi
 		const long double now_time = ArkApi::GetApiUtils().GetWorld()->TimeSecondsField();
 
 		const auto spam_check = now_time - last_chat_time < 1.0;
-		if (last_chat_time > 0 && spam_check)		{
+		if (last_chat_time > 0 && spam_check) {
 			return;
 		}
 
@@ -104,7 +105,7 @@ namespace ArkApi
 		const auto prevent_default = dynamic_cast<ArkApi::Commands&>(*API::game_api->GetCommands()).
 			CheckOnChatMessageCallbacks(player_controller, message, mode, spam_check, command_executed);
 
-		if (command_executed || prevent_default)		{
+		if (command_executed || prevent_default) {
 			return;
 		}
 
@@ -123,7 +124,7 @@ namespace ArkApi
 	void Hook_RCONClientConnection_ProcessRCONPacket(RCONClientConnection* _this, RCONPacket* packet,
 		UWorld* in_world)
 	{
-		if (_this->IsAuthenticatedField())		{
+		if (_this->IsAuthenticatedField()) {
 			dynamic_cast<Commands&>(*API::game_api->GetCommands()).CheckRconCommands(_this, packet, in_world);
 		}
 

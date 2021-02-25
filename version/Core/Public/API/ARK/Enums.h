@@ -377,6 +377,17 @@ namespace EPrimalStatsValueTypes
 	};
 }
 
+namespace  ELevelTick
+{
+	enum Type
+{
+	LEVELTICK_TimeOnly = 0,
+	LEVELTICK_ViewportsOnly = 1,
+	LEVELTICK_All = 2,
+	LEVELTICK_PauseTick = 3,
+};
+}
+
 namespace EChatSendMode
 {
 	enum Type
