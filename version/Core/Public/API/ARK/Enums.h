@@ -317,6 +317,14 @@ enum class EMoveComponentFlags
 	MOVECOMP_DoCenterOfMassCheck
 };
 
+enum class ELevelTick
+{
+	LEVELTICK_TimeOnly,
+	LEVELTICK_ViewportsOnly,
+	LEVELTICK_All,
+	LEVELTICK_PauseTick,
+};
+
 namespace ETribeGroupPermission
 {
 	enum Type
@@ -375,17 +383,6 @@ namespace EPrimalStatsValueTypes
 		HitsPlayerCritical = 0x6,
 		MAX = 0x7,
 	};
-}
-
-namespace  ELevelTick
-{
-	enum Type
-{
-	LEVELTICK_TimeOnly = 0,
-	LEVELTICK_ViewportsOnly = 1,
-	LEVELTICK_All = 2,
-	LEVELTICK_PauseTick = 3,
-};
 }
 
 namespace EChatSendMode

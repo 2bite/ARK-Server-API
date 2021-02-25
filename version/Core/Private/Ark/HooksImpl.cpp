@@ -13,7 +13,7 @@ namespace ArkApi
 	// Hooks declaration
 	DECLARE_HOOK(UEngine_Init, void, DWORD64, DWORD64);
 	DECLARE_HOOK(UWorld_InitWorld, void, UWorld*, DWORD64);
-	DECLARE_HOOK(UWorld_Tick, void, DWORD64, ELevelTick::Type, float);
+	DECLARE_HOOK(UWorld_Tick, void, DWORD64, ELevelTick, float);
 	DECLARE_HOOK(AShooterGameMode_InitGame, void, AShooterGameMode*, FString*, FString*, FString*);
 	DECLARE_HOOK(AShooterPlayerController_ServerSendChatMessage_Impl, void, AShooterPlayerController*, FString*,
 	EChatSendMode::Type);
@@ -68,11 +68,13 @@ namespace ArkApi
 		UWorld_InitWorld_original(world, ivs);
 	}
 
-	void Hook_UWorld_Tick(DWORD64 world, ELevelTick::Type tick_type, float delta_seconds)
+	void Hook_UWorld_Tick(DWORD64 world, ELevelTick tick_type, float delta_seconds)
 	{
-		Log::GetLog()->info("UWorld::Tick called world:{} tick_type:{} delta_seconds:{}", world, tick_type, delta_seconds);
-		if (auto* command = dynamic_cast<Commands*>(API::game_api->GetCommands().get())) {
-			command->CheckOnTickCallbacks(delta_seconds);
+
+		if (tick_type == ELevelTick::LEVELTICK_All && delta_seconds > 0) {
+			if (auto* command = dynamic_cast<Commands*>(API::game_api->GetCommands().get())) {
+				command->CheckOnTickCallbacks(delta_seconds);
+			}
 		}
 
 		UWorld_Tick_original(world, tick_type, delta_seconds);

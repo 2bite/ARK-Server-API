@@ -219,6 +219,14 @@ enum class EMoveComponentFlags
 	MOVECOMP_DoCenterOfMassCheck
 };
 
+enum class ELevelTick
+{
+	LEVELTICK_TimeOnly,
+	LEVELTICK_ViewportsOnly,
+	LEVELTICK_All,
+	LEVELTICK_PauseTick,
+};
+
 namespace EOnDesrializationType
 {
 	enum Type
