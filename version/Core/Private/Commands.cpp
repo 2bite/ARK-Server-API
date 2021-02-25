@@ -90,24 +90,26 @@ namespace ArkApi
 
 	void Commands::CheckOnTickCallbacks(float delta_seconds)
 	{
-		for (const auto& data : on_tick_callbacks_)
-		{
-			if (data)
+		std::for_each(on_tick_callbacks_.begin(), on_tick_callbacks_.end(),
+			[delta_seconds](std::shared_ptr<OnTickCallback>& data)
 			{
-				data->callback(delta_seconds);
+				if (data) {
+					data->callback(delta_seconds);
+				}
 			}
-		}
+		);
 	}
 
 	void Commands::CheckOnTimerCallbacks()
 	{
-		for (const auto& data : on_timer_callbacks_)
-		{
-			if (data)
+		std::for_each(on_timer_callbacks_.begin(), on_timer_callbacks_.end(),
+			[](std::shared_ptr<OnTimerCallback>& data)
 			{
-				data->callback();
+				if (data) {
+					data->callback();
+				}
 			}
-		}
+		);
 	}
 
 	bool Commands::CheckOnChatMessageCallbacks(
