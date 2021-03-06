@@ -93,7 +93,7 @@ namespace ArkApi
 		std::for_each(on_tick_callbacks_.begin(), on_tick_callbacks_.end(),
 			[delta_seconds](std::shared_ptr<OnTickCallback>& data)
 			{
-				if (data) {
+				if (data && data->callback) {
 					data->callback(delta_seconds);
 				}
 			}
@@ -105,7 +105,7 @@ namespace ArkApi
 		std::for_each(on_timer_callbacks_.begin(), on_timer_callbacks_.end(),
 			[](std::shared_ptr<OnTimerCallback>& data)
 			{
-				if (data) {
+				if (data && data->callback) {
 					data->callback();
 				}
 			}

@@ -121,26 +121,27 @@ namespace ArkApi
 		RCONClientConnection_ProcessRCONPacket_original(connection, packet, in_world);
 	}
 
-
 	void Hook_UWorld_Tick(UWorld* world, ELevelTick tick_type, float delta_seconds)
 	{
 		if (world && tick_type == ELevelTick::LEVELTICK_All && delta_seconds > 0) {
-			if (auto* command = dynamic_cast<Commands*>(API::game_api->GetCommands().get())) {
+			Commands* command = dynamic_cast<Commands*>(API::game_api->GetCommands().get());
+			if (command) {
 				command->CheckOnTickCallbacks(delta_seconds);
 			}
 		}
 
 		UWorld_Tick_original(world, tick_type, delta_seconds);
 	}
-	
+
 	void Hook_AGameState_DefaultTimer(AGameState* game_state)
 	{
-		if (game_state)		{
-			if (auto* command = dynamic_cast<Commands*>(API::game_api->GetCommands().get())) {
+		if (game_state) {
+			Commands* command = dynamic_cast<Commands*>(API::game_api->GetCommands().get());
+			if (command) {
 				command->CheckOnTimerCallbacks();
 			}
 		}
-	
+
 		AGameState_DefaultTimer_original(game_state);
 	}
 
