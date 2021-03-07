@@ -27,7 +27,7 @@ namespace ArkApi
 	{
 		on_tick_callbacks_.push_back(std::make_shared<OnTickCallback>(id, callback));
 	}
-
+	
 	void Commands::AddOnTimerCallback(const FString& id, const std::function<void()>& callback)
 	{
 		on_timer_callbacks_.push_back(std::make_shared<OnTimerCallback>(id, callback));
@@ -90,26 +90,38 @@ namespace ArkApi
 
 	void Commands::CheckOnTickCallbacks(float delta_seconds)
 	{
-		std::for_each(on_tick_callbacks_.begin(), on_tick_callbacks_.end(),
-			[delta_seconds](std::shared_ptr<OnTickCallback>& data)
+		__try
+		{
+			for (const auto& data : on_tick_callbacks_)
 			{
-				if (data && data->callback) {
+				if (data)
+				{
 					data->callback(delta_seconds);
 				}
 			}
-		);
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER)
+		{
+			Log::GetLog()->error("Error: CheckOnTickCallbacks");
+		}
 	}
 
 	void Commands::CheckOnTimerCallbacks()
 	{
-		std::for_each(on_timer_callbacks_.begin(), on_timer_callbacks_.end(),
-			[](std::shared_ptr<OnTimerCallback>& data)
+		__try
+		{
+			for (const auto& data : on_timer_callbacks_)
 			{
-				if (data && data->callback) {
+				if (data)
+				{
 					data->callback();
 				}
 			}
-		);
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER)
+		{
+			Log::GetLog()->error("Error: CheckOnTimerCallbacks");
+		}
 	}
 
 	bool Commands::CheckOnChatMessageCallbacks(

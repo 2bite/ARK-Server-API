@@ -104,6 +104,9 @@ namespace ArkApi
 		* \return true if success, false otherwise
 		*/
 		virtual bool RemoveOnChatMessageCallback(const FString& id) = 0;
+
+		//virtual void CheckOnTickCallbacks(float delta_seconds) = 0;
+		//virtual void CheckOnTimerCallbacks() = 0;
 	};
 
 	ARK_API ICommands& APIENTRY GetCommands();
