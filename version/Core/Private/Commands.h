@@ -133,11 +133,11 @@ namespace ArkApi
 		{
 			__try
 			{
-				return CheckCommands(message, commands, std::forward<Args>(args)...);;
+				return CheckCommands(message, commands, std::forward<Args>(args)...);
 			}
 			__except (EXCEPTION_EXECUTE_HANDLER)
 			{
-				Log::GetLog()->error("Error: CheckCommands, Command: {}", last_commands_);
+				Log::GetLog()->error("CheckCommands, Command: {}", last_commands_);
 			}
 
 			return false;

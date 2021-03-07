@@ -93,7 +93,7 @@ namespace ArkApi
 		}
 		__except (EXCEPTION_EXECUTE_HANDLER)
 		{
-			Log::GetLog()->error("Error: CheckOnTickCallbacks, Command: {}", last_on_tick_command_);
+			Log::GetLog()->error("CheckOnTickCallbacks, Command: {}", last_on_tick_command_);
 		}
 	}
 
@@ -117,7 +117,7 @@ namespace ArkApi
 		}
 		__except (EXCEPTION_EXECUTE_HANDLER)
 		{
-			Log::GetLog()->error("Error: CheckOnTimerCallbacks, Command: {}", last_on_timer_command_);
+			Log::GetLog()->error("CheckOnTimerCallbacks, Command: {}", last_on_timer_command_);
 		}
 	}
 
@@ -142,7 +142,7 @@ namespace ArkApi
 		}
 		__except (EXCEPTION_EXECUTE_HANDLER)
 		{
-			Log::GetLog()->error("Error: CheckOnChatMessageCallbacks, Command: {}", last_on_chat_message_command_);
+			Log::GetLog()->error("CheckOnChatMessageCallbacks, Command: {}", last_on_chat_message_command_);
 		}
 
 		return false;
