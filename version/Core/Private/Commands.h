@@ -43,15 +43,18 @@ namespace ArkApi
 		bool RemoveOnTimerCallback(const FString& id) override;
 		bool RemoveOnChatMessageCallback(const FString& id) override;
 
-		bool CheckChatCommands(AShooterPlayerController* shooter_player_controller, FString* message,
-			EChatSendMode::Type mode);
+		bool CheckChatCommands(AShooterPlayerController* shooter_player_controller, FString* message, EChatSendMode::Type mode);
 		bool CheckConsoleCommands(APlayerController* a_player_controller, FString* cmd, bool write_to_log);
-		bool CheckRconCommands(RCONClientConnection* rcon_client_connection, RCONPacket* rcon_packet,
-			UWorld* u_world);
+		bool CheckRconCommands(RCONClientConnection* rcon_client_connection, RCONPacket* rcon_packet, UWorld* u_world);
 
+		void TryCheckOnTickCallbacks(float delta_seconds);
 		void CheckOnTickCallbacks(float delta_seconds);
+	
+		void TryCheckOnTimerCallbacks();
 		void CheckOnTimerCallbacks();
-
+		
+		bool TryCheckOnChatMessageCallbacks(AShooterPlayerController* player_controller, FString* message,
+			EChatSendMode::Type mode, bool spam_check, bool command_executed);
 		bool CheckOnChatMessageCallbacks(AShooterPlayerController* player_controller, FString* message,
 			EChatSendMode::Type mode, bool spam_check, bool command_executed);
 
@@ -61,7 +64,7 @@ namespace ArkApi
 		{
 			Command(FString command, std::function<T> callback)
 				: command(std::move(command)),
-				  callback(std::move(callback))
+				callback(std::move(callback))
 			{
 			}
 
@@ -97,6 +100,7 @@ namespace ArkApi
 			return false;
 		}
 
+		
 		template <typename T, typename... Args>
 		bool CheckCommands(const FString& message, const std::vector<std::shared_ptr<T>>& commands, Args&&... args)
 		{
@@ -114,6 +118,7 @@ namespace ArkApi
 			{
 				if (command_text.Compare(command->command, ESearchCase::IgnoreCase) == 0)
 				{
+					last_commands_ = command->command.ToString();
 					command->callback(std::forward<Args>(args)...);
 
 					return true;
@@ -123,12 +128,34 @@ namespace ArkApi
 			return false;
 		}
 
+		template <typename T, typename... Args>
+		bool TryCheckCommands(const FString& message, const std::vector<std::shared_ptr<T>>& commands, Args&&... args)
+		{
+			__try
+			{
+				return CheckCommands(message, commands, std::forward<Args>(args)...);;
+			}
+			__except (EXCEPTION_EXECUTE_HANDLER)
+			{
+				Log::GetLog()->error("Error: CheckCommands, Command: {}", last_commands_);
+			}
+
+			return false;
+	
+		}
+
+		std::string last_commands_;
 		std::vector<std::shared_ptr<ChatCommand>> chat_commands_;
 		std::vector<std::shared_ptr<ConsoleCommand>> console_commands_;
 		std::vector<std::shared_ptr<RconCommand>> rcon_commands_;
 
+		std::string last_on_tick_command_;
 		std::vector<std::shared_ptr<OnTickCallback>> on_tick_callbacks_;
+
+		std::string last_on_timer_command_;
 		std::vector<std::shared_ptr<OnTimerCallback>> on_timer_callbacks_;
+
+		std::string last_on_chat_message_command_;
 		std::vector<std::shared_ptr<OnChatMessageCallback>> on_chat_message_callbacks_;
 	};
 } // namespace ArkApi

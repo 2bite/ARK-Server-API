@@ -5,20 +5,20 @@
 namespace ArkApi
 {
 	void Commands::AddChatCommand(const FString& command,
-	                              const std::function<void(AShooterPlayerController*, FString*, EChatSendMode::Type)>&
-	                              callback)
+		const std::function<void(AShooterPlayerController*, FString*, EChatSendMode::Type)>&
+		callback)
 	{
 		chat_commands_.push_back(std::make_shared<ChatCommand>(command, callback));
 	}
 
 	void Commands::AddConsoleCommand(const FString& command,
-	                                 const std::function<void(APlayerController*, FString*, bool)>& callback)
+		const std::function<void(APlayerController*, FString*, bool)>& callback)
 	{
 		console_commands_.push_back(std::make_shared<ConsoleCommand>(command, callback));
 	}
 
 	void Commands::AddRconCommand(const FString& command,
-	                              const std::function<void(RCONClientConnection*, RCONPacket*, UWorld*)>& callback)
+		const std::function<void(RCONClientConnection*, RCONPacket*, UWorld*)>& callback)
 	{
 		rcon_commands_.push_back(std::make_shared<RconCommand>(command, callback));
 	}
@@ -27,15 +27,15 @@ namespace ArkApi
 	{
 		on_tick_callbacks_.push_back(std::make_shared<OnTickCallback>(id, callback));
 	}
-	
+
 	void Commands::AddOnTimerCallback(const FString& id, const std::function<void()>& callback)
 	{
 		on_timer_callbacks_.push_back(std::make_shared<OnTimerCallback>(id, callback));
 	}
 
 	void Commands::AddOnChatMessageCallback(const FString& id,
-	                                        const std::function<bool(AShooterPlayerController*, FString*,
-	                                                                 EChatSendMode::Type, bool, bool)>& callback)
+		const std::function<bool(AShooterPlayerController*, FString*,
+			EChatSendMode::Type, bool, bool)>& callback)
 	{
 		on_chat_message_callbacks_.push_back(std::make_shared<OnChatMessageCallback>(id, callback));
 	}
@@ -70,70 +70,91 @@ namespace ArkApi
 		return RemoveCommand<OnChatMessageCallback>(id, on_chat_message_callbacks_);
 	}
 
-	bool Commands::CheckChatCommands(AShooterPlayerController* shooter_player_controller, FString* message,
-	                                 EChatSendMode::Type mode)
+	bool Commands::CheckChatCommands(AShooterPlayerController* shooter_player_controller, FString* message, EChatSendMode::Type mode)
 	{
-		return CheckCommands<ChatCommand>(*message, chat_commands_, shooter_player_controller, message, mode);
+		return TryCheckCommands<ChatCommand>(*message, chat_commands_, shooter_player_controller, message, mode);
 	}
 
 	bool Commands::CheckConsoleCommands(APlayerController* a_player_controller, FString* cmd, bool write_to_log)
 	{
-		return CheckCommands<ConsoleCommand>(*cmd, console_commands_, a_player_controller, cmd, write_to_log);
+		return TryCheckCommands<ConsoleCommand>(*cmd, console_commands_, a_player_controller, cmd, write_to_log);
 	}
 
-	bool Commands::CheckRconCommands(RCONClientConnection* rcon_client_connection, RCONPacket* rcon_packet,
-	                                 UWorld* u_world)
+	bool Commands::CheckRconCommands(RCONClientConnection* rcon_client_connection, RCONPacket* rcon_packet, UWorld* u_world)
 	{
-		return CheckCommands<RconCommand>(rcon_packet->Body, rcon_commands_, rcon_client_connection, rcon_packet,
-		                                  u_world);
+		return TryCheckCommands<RconCommand>(rcon_packet->Body, rcon_commands_, rcon_client_connection, rcon_packet, u_world);
+	}
+
+	void Commands::TryCheckOnTickCallbacks(float delta_seconds)
+	{
+		__try
+		{
+			CheckOnTickCallbacks(delta_seconds);
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER)
+		{
+			Log::GetLog()->error("Error: CheckOnTickCallbacks, Command: {}", last_on_tick_command_);
+		}
 	}
 
 	void Commands::CheckOnTickCallbacks(float delta_seconds)
 	{
+		for (const auto& data : on_tick_callbacks_)
+		{
+			if (data)
+			{
+				last_on_tick_command_ = data->command.ToString();
+				data->callback(delta_seconds);
+			}
+		}
+	}
+
+	void Commands::TryCheckOnTimerCallbacks()
+	{
 		__try
 		{
-			for (const auto& data : on_tick_callbacks_)
-			{
-				if (data)
-				{
-					data->callback(delta_seconds);
-				}
-			}
+			CheckOnTimerCallbacks();
 		}
 		__except (EXCEPTION_EXECUTE_HANDLER)
 		{
-			Log::GetLog()->error("Error: CheckOnTickCallbacks");
+			Log::GetLog()->error("Error: CheckOnTimerCallbacks, Command: {}", last_on_timer_command_);
 		}
 	}
 
 	void Commands::CheckOnTimerCallbacks()
 	{
-		__try
+		for (const auto& data : on_timer_callbacks_)
 		{
-			for (const auto& data : on_timer_callbacks_)
+			if (data)
 			{
-				if (data)
-				{
-					data->callback();
-				}
+				last_on_timer_command_ = data->command.ToString();
+				data->callback();
 			}
-		}
-		__except (EXCEPTION_EXECUTE_HANDLER)
-		{
-			Log::GetLog()->error("Error: CheckOnTimerCallbacks");
 		}
 	}
 
-	bool Commands::CheckOnChatMessageCallbacks(
-		AShooterPlayerController* player_controller,
-		FString* message,
-		EChatSendMode::Type mode,
-		bool spam_check,
-		bool command_executed)
+	bool Commands::TryCheckOnChatMessageCallbacks(AShooterPlayerController* player_controller, FString* message,
+		EChatSendMode::Type mode, bool spam_check, bool command_executed)
+	{
+		__try
+		{
+			return CheckOnChatMessageCallbacks(player_controller, message, mode, spam_check, command_executed);
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER)
+		{
+			Log::GetLog()->error("Error: CheckOnChatMessageCallbacks, Command: {}", last_on_chat_message_command_);
+		}
+
+		return false;
+	}
+
+	bool Commands::CheckOnChatMessageCallbacks(AShooterPlayerController* player_controller, FString* message,
+		EChatSendMode::Type mode, bool spam_check, bool command_executed)
 	{
 		bool prevent_default = false;
 		for (const auto& data : on_chat_message_callbacks_)
 		{
+			last_on_chat_message_command_ = data->command.ToString();
 			prevent_default |= data->callback(player_controller, message, mode, spam_check, command_executed);
 		}
 

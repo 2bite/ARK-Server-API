@@ -93,7 +93,7 @@ namespace ArkApi
 			CheckChatCommands(player_controller, message, mode);
 
 		const auto prevent_default = dynamic_cast<ArkApi::Commands&>(*API::game_api->GetCommands()).
-			CheckOnChatMessageCallbacks(player_controller, message, mode, spam_check, command_executed);
+			TryCheckOnChatMessageCallbacks(player_controller, message, mode, spam_check, command_executed);
 
 		if (command_executed || prevent_default) {
 			return;
@@ -121,28 +121,17 @@ namespace ArkApi
 		RCONClientConnection_ProcessRCONPacket_original(connection, packet, in_world);
 	}
 
-	//void __fastcall UWorld::Tick(UWorld *this, ELevelTick TickType, float DeltaSeconds)
 	void Hook_UWorld_Tick(UWorld* world, ELevelTick tick_type, float delta_seconds)
 	{
-		//dynamic_cast<Commands&>(*API::game_api->GetCommands()).CheckOnTickCallbacks(delta_seconds);
-		Commands* command = dynamic_cast<Commands*>(API::game_api->GetCommands().get());
-		if (command)
-		{
-			command->CheckOnTickCallbacks(delta_seconds);
-		}
+		dynamic_cast<Commands&>(*API::game_api->GetCommands()).TryCheckOnTickCallbacks(delta_seconds);
 		
 		UWorld_Tick_original(world, tick_type, delta_seconds);
 	}
 
 	void Hook_AGameState_DefaultTimer(AGameState* game_state)
 	{
-		//dynamic_cast<Commands&>(*API::game_api->GetCommands()).CheckOnTimerCallbacks();
-		Commands* command = dynamic_cast<Commands*>(API::game_api->GetCommands().get());
-		if (command)
-		{
-			command->CheckOnTimerCallbacks();
-		}
-
+		dynamic_cast<Commands&>(*API::game_api->GetCommands()).TryCheckOnTimerCallbacks();
+		
 		AGameState_DefaultTimer_original(game_state);
 	}
 
