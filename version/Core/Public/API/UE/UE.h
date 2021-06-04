@@ -499,15 +499,6 @@ struct Globals
 			bCopyTransientsFromClassDefaults, InInstanceGraph);
 	}
 
-	//UObject *__fastcall StaticDuplicateObject(UObject *SourceObject, UObject *DestOuter, const wchar_t *DestName, EObjectFlags FlagMask, UClass *DestClass, EDuplicateForPie DuplicateForPIE)
-	static UObject* StaticDuplicateObject(UObject* SourceObject, UObject* DestOuter, const wchar_t* DestName, EObjectFlags FlagMask, UClass* DestClass, EDuplicateForPie DuplicateForPIE)
-	{
-		return NativeCall<UObject*, UObject*, UObject*, const wchar_t*, EObjectFlags, UClass*, EDuplicateForPie>(
-			nullptr, "Global.StaticDuplicateObject", SourceObject, DestOuter, DestName, FlagMask, DestClass, DuplicateForPIE);
-	}
-
-	//UObject *__fastcall StaticDuplicateObjectEx(FObjectDuplicationParameters *Parameters)
-
 	//UObject *__fastcall StaticFindObjectFastInternal(UClass *ObjectClass, UObject *ObjectPackage, FName ObjectName, bool bExactClass, bool bAnyPackage, EObjectFlags ExcludeFlags)
 	template <typename T>
 	static void GetPrivateStaticClassBody(const wchar_t* PackageName, const wchar_t* Name, T** ReturnClass,

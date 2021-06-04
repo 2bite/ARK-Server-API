@@ -124,14 +124,14 @@ namespace ArkApi
 	void Hook_UWorld_Tick(UWorld* world, ELevelTick tick_type, float delta_seconds)
 	{
 		dynamic_cast<Commands&>(*API::game_api->GetCommands()).TryCheckOnTickCallbacks(delta_seconds);
-		
+
 		UWorld_Tick_original(world, tick_type, delta_seconds);
 	}
 
 	void Hook_AGameState_DefaultTimer(AGameState* game_state)
 	{
 		dynamic_cast<Commands&>(*API::game_api->GetCommands()).TryCheckOnTimerCallbacks();
-		
+
 		AGameState_DefaultTimer_original(game_state);
 	}
 

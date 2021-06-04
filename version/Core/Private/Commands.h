@@ -49,10 +49,10 @@ namespace ArkApi
 
 		void TryCheckOnTickCallbacks(float delta_seconds);
 		void CheckOnTickCallbacks(float delta_seconds);
-	
+
 		void TryCheckOnTimerCallbacks();
 		void CheckOnTimerCallbacks();
-		
+
 		bool TryCheckOnChatMessageCallbacks(AShooterPlayerController* player_controller, FString* message,
 			EChatSendMode::Type mode, bool spam_check, bool command_executed);
 		bool CheckOnChatMessageCallbacks(AShooterPlayerController* player_controller, FString* message,
@@ -100,7 +100,7 @@ namespace ArkApi
 			return false;
 		}
 
-		
+
 		template <typename T, typename... Args>
 		bool CheckCommands(const FString& message, const std::vector<std::shared_ptr<T>>& commands, Args&&... args)
 		{
@@ -141,7 +141,7 @@ namespace ArkApi
 			}
 
 			return false;
-	
+
 		}
 
 		std::string last_commands_;

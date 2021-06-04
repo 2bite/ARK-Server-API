@@ -70,7 +70,7 @@ namespace AtlasApi
 
 	void Hook_UWorld_Tick(DWORD64 world, DWORD64 tick_type, float delta_seconds)
 	{
-		dynamic_cast<ArkApi::Commands&>(*API::game_api->GetCommands()).TryCheckOnTickCallbacks(delta_seconds);
+		dynamic_cast<ArkApi::Commands&>(*API::game_api->GetCommands()).CheckOnTickCallbacks(delta_seconds);
 
 		UWorld_Tick_original(world, tick_type, delta_seconds);
 	}
@@ -101,7 +101,7 @@ namespace AtlasApi
 			CheckChatCommands(player_controller, message, mode);
 
 		const auto prevent_default = dynamic_cast<ArkApi::Commands&>(*API::game_api->GetCommands()).
-			TryCheckOnChatMessageCallbacks(player_controller, message, mode, spam_check, command_executed);
+			CheckOnChatMessageCallbacks(player_controller, message, mode, spam_check, command_executed);
 
 		if (command_executed || prevent_default)
 		{
@@ -133,7 +133,7 @@ namespace AtlasApi
 
 	void Hook_AGameState_DefaultTimer(AGameState* _this)
 	{
-		dynamic_cast<ArkApi::Commands&>(*API::game_api->GetCommands()).TryCheckOnTimerCallbacks();
+		dynamic_cast<ArkApi::Commands&>(*API::game_api->GetCommands()).CheckOnTimerCallbacks();
 
 		AGameState_DefaultTimer_original(_this);
 	}
