@@ -1152,8 +1152,8 @@ private:
     template< class OtherType, int OtherMode > friend class TWeakPtr;
 
 	// Declare ourselves as a friend of TSharedPtr so we can access members as needed
-    template< class OtherType, int OtherMode = ESPMode::Fast > friend class TSharedPtr;
-
+    //template< class OtherType, int OtherMode = ESPMode::Fast > friend class TSharedPtr;
+	template< class OtherType, int OtherMode > friend class TSharedPtr;
 private:
 
 	/** The object we have a weak reference to.  Can be nullptr.  Also, it's important to note that because
