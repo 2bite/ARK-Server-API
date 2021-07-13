@@ -16,7 +16,7 @@
 
 namespace API
 {
-	constexpr float api_version = 3.51f;
+	constexpr float api_version = 3.5f;
 
 	ArkBaseApi::ArkBaseApi()
 		: commands_(std::make_unique<ArkApi::Commands>()),
@@ -28,7 +28,7 @@ namespace API
 	bool ArkBaseApi::Init()
 	{
 		Log::GetLog()->info("-----------------------------------------------");
-		Log::GetLog()->info("ARK: Server Api V{:.1f}", GetVersion());
+		Log::GetLog()->info("ARK: Server Api V{:.2f}", GetVersion());
 		Log::GetLog()->info("Loading...\n");
 
 		PdbReader pdb_reader;
