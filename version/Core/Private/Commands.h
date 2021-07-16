@@ -48,14 +48,14 @@ namespace ArkApi
 		bool CheckConsoleCommands(APlayerController* a_player_controller, FString* cmd, bool write_to_log);
 		bool CheckRconCommands(RCONClientConnection* rcon_client_connection, RCONPacket* rcon_packet,
 		                       UWorld* u_world);
-		//void TryCheckOnTickCallbacks(float delta_seconds);
+		void TryCheckOnTickCallbacks(float delta_seconds);
 		void CheckOnTickCallbacks(float delta_seconds);
 
-		//void TryCheckOnTimerCallbacks();
+		void TryCheckOnTimerCallbacks();
 		void CheckOnTimerCallbacks();
 
-		//bool TryCheckOnChatMessageCallbacks(AShooterPlayerController* player_controller, FString* message,
-		//	EChatSendMode::Type mode, bool spam_check, bool command_executed);
+		bool TryCheckOnChatMessageCallbacks(AShooterPlayerController* player_controller, FString* message,
+			EChatSendMode::Type mode, bool spam_check, bool command_executed);
 		bool CheckOnChatMessageCallbacks(AShooterPlayerController* player_controller, FString* message,
 			EChatSendMode::Type mode, bool spam_check, bool command_executed);
 
@@ -131,13 +131,13 @@ namespace ArkApi
 		std::vector<std::shared_ptr<ConsoleCommand>> console_commands_;
 		std::vector<std::shared_ptr<RconCommand>> rcon_commands_;
 
-		//std::string last_on_tick_command_;
+		std::string last_on_tick_command_;
 		std::vector<std::shared_ptr<OnTickCallback>> on_tick_callbacks_;
 
-		//std::string last_on_timer_command_;
+		std::string last_on_timer_command_;
 		std::vector<std::shared_ptr<OnTimerCallback>> on_timer_callbacks_;
 
-		//std::string last_on_chat_message_command_;
+		std::string last_on_chat_message_command_;
 		std::vector<std::shared_ptr<OnChatMessageCallback>> on_chat_message_callbacks_;
 	};
 } // namespace ArkApi

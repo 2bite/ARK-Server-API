@@ -88,163 +88,94 @@ namespace ArkApi
 			u_world);
 	}
 
-	//void Commands::TryCheckOnTickCallbacks(float delta_seconds)
-	//{
-	//	__try
-	//	{
-	//		CheckOnTickCallbacks(delta_seconds);
-	//	}
-	//	__except (EXCEPTION_EXECUTE_HANDLER)
-	//	{
-	//		Log::GetLog()->error("Prevented OnTick Crash in: {}", last_on_tick_command_);
-	//	}
-	//}
+	void Commands::TryCheckOnTickCallbacks(float delta_seconds)
+	{
 
-	//void Commands::CheckOnTickCallbacks(float delta_seconds)
-	//{
-	//	for (const auto& data : on_tick_callbacks_)
-	//	{
-	//		if (data) {
-	//			if (typeid(data->command) == typeid(FString) && !data->command.IsEmpty())
-	//				last_on_tick_command_ = data->command.ToString();
-	//			else
-	//				last_on_tick_command_ = "Unknown";
+		for (const auto& data : on_tick_callbacks_)
+		{
+			if (data) {
+				if (typeid(data->command) == typeid(FString) && !data->command.IsEmpty())
+					last_on_tick_command_ = data->command.ToString();
+				else
+					last_on_tick_command_ = "Unknown";
 
-	//			data->callback(delta_seconds);
-	//		}
-	//	}
-	//}
-
-	//void Commands::TryCheckOnTimerCallbacks()
-	//{
-	//	__try
-	//	{
-	//		CheckOnTimerCallbacks();
-	//	}
-	//	__except (EXCEPTION_EXECUTE_HANDLER)
-	//	{
-	//		Log::GetLog()->error("Prevented OnTimer Crash in: {}", last_on_timer_command_);
-	//	}
-	//}
-
-	//void Commands::CheckOnTimerCallbacks()
-	//{
-	//	for (const auto& data : on_timer_callbacks_)
-	//	{
-	//		if (data) {
-	//			if (typeid(data->command) == typeid(FString) && !data->command.IsEmpty())
-	//				last_on_timer_command_ = data->command.ToString();
-	//			else
-	//				last_on_timer_command_ = "Unknown";
-
-	//			data->callback();
-	//		}
-	//	}
-	//}
-
-	//bool Commands::TryCheckOnChatMessageCallbacks(AShooterPlayerController* player_controller, FString* message,
-	//	EChatSendMode::Type mode, bool spam_check, bool command_executed)
-	//{
-	//	__try
-	//	{
-	//		return CheckOnChatMessageCallbacks(player_controller, message, mode, spam_check, command_executed);
-	//	}
-	//	__except (EXCEPTION_EXECUTE_HANDLER)
-	//	{
-	//		Log::GetLog()->error("Prevented OnChatMessage Crash in: {}", last_on_chat_message_command_);
-	//	}
-
-	//	return false;
-	//}
-
-	//bool Commands::CheckOnChatMessageCallbacks(AShooterPlayerController* player_controller, FString* message,
-	//	EChatSendMode::Type mode, bool spam_check, bool command_executed)
-	//{
-	//	bool prevent_default = false;
-	//	for (const auto& data : on_chat_message_callbacks_) {
-
-	//		if (typeid(data->command) == typeid(FString) && !data->command.IsEmpty())
-	//			last_on_chat_message_command_ = data->command.ToString();
-	//		else
-	//			last_on_chat_message_command_ = "Unknown";
-
-	//		prevent_default |= data->callback(player_controller, message, mode, spam_check, command_executed);
-	//	}
-
-	//	return prevent_default;
-	//}
+				data->callback(delta_seconds);
+			}
+		}
+	}
 
 	void Commands::CheckOnTickCallbacks(float delta_seconds)
 	{
-		for (const auto& data : on_tick_callbacks_)
+		__try
 		{
-			if (data)
-			{
-				try
-				{
-					data->callback(delta_seconds);
-				}
-				catch (...)
-				{
-					if (typeid(data->command) == typeid(FString) && !data->command.IsEmpty())
-						Log::GetLog()->error(fmt::format("Prevented OnTick Crash in: {}", data->command.ToString()));
-					else
-						Log::GetLog()->error("Prevented Tick Crash in: Unknown");
-				}
+			TryCheckOnTickCallbacks(delta_seconds);
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER)
+		{
+			Log::GetLog()->error("Prevented OnTick Crash in: {}", last_on_tick_command_);
+		}
+	}
+
+	void Commands::TryCheckOnTimerCallbacks()
+	{
+		for (const auto& data : on_timer_callbacks_)
+		{
+			if (data) {
+				if (typeid(data->command) == typeid(FString) && !data->command.IsEmpty())
+					last_on_timer_command_ = data->command.ToString();
+				else
+					last_on_timer_command_ = "Unknown";
+
+				data->callback();
 			}
 		}
 	}
 
 	void Commands::CheckOnTimerCallbacks()
 	{
-		for (const auto& data : on_timer_callbacks_)
+		__try
 		{
-			if (data)
-			{
-				try
-				{
-					data->callback();
-				}
-				catch (...)
-				{
-					if (typeid(data->command) == typeid(FString) && !data->command.IsEmpty())
-						Log::GetLog()->error(fmt::format("Prevented OnTimer Crash in: {}", data->command.ToString()));
-					else
-						Log::GetLog()->error("Prevented Timer Crash in: Unknown");
-				}
-			}
+			TryCheckOnTimerCallbacks();
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER)
+		{
+			Log::GetLog()->error("Prevented OnTimer Crash in: {}", last_on_timer_command_);
 		}
 	}
 
-	bool Commands::CheckOnChatMessageCallbacks(
-		AShooterPlayerController* player_controller,
-		FString* message,
-		EChatSendMode::Type mode,
-		bool spam_check,
-		bool command_executed)
+	bool Commands::TryCheckOnChatMessageCallbacks(AShooterPlayerController* player_controller, FString* message,
+		EChatSendMode::Type mode, bool spam_check, bool command_executed)
 	{
+
 		bool prevent_default = false;
-		for (const auto& data : on_chat_message_callbacks_)
-		{
-			if (data)
-			{
-				try
-				{
-					prevent_default |= data->callback(player_controller, message, mode, spam_check, command_executed);
-				}
-				catch (...)
-				{
-					if (typeid(data->command) == typeid(FString) && !data->command.IsEmpty())
-						Log::GetLog()->error(fmt::format("Prevented OnChatMessage Crash in: {}", data->command.ToString()));
-					else
-						Log::GetLog()->error("Prevented OnChatMessage Crash in: Unknown");
-				}
-			}
+		for (const auto& data : on_chat_message_callbacks_) {
+
+			if (typeid(data->command) == typeid(FString) && !data->command.IsEmpty())
+				last_on_chat_message_command_ = data->command.ToString();
+			else
+				last_on_chat_message_command_ = "Unknown";
+
+			prevent_default |= data->callback(player_controller, message, mode, spam_check, command_executed);
 		}
 
 		return prevent_default;
 	}
 
+	bool Commands::CheckOnChatMessageCallbacks(AShooterPlayerController* player_controller, FString* message,
+		EChatSendMode::Type mode, bool spam_check, bool command_executed) 
+	{
+		__try
+		{
+			return TryCheckOnChatMessageCallbacks(player_controller, message, mode, spam_check, command_executed);
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER)
+		{
+			Log::GetLog()->error("Prevented OnChatMessage Crash in: {}", last_on_chat_message_command_);
+		}
+
+		return false;
+	}
+	
 	// Free function
 	ICommands& GetCommands()
 	{
